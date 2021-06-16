@@ -34,7 +34,7 @@ public class TorchLimit extends PluginBase implements Listener {
             this.saveResource("config.yml", false);
         }
         this.config = new Config(this.getDataFolder() + "/config.yml", Config.YAML);
-        int limitTime = 0;
+        long limitTime = 0;
         if (Integer.parseInt(config.getString("day")) != 0) {
             limitTime = limitTime + Integer.parseInt(config.getString("day")) * 86400000;
         }
@@ -117,7 +117,7 @@ public class TorchLimit extends PluginBase implements Listener {
                     this.OpenWorlds.add(level);
                     config.set("open-worlds", OpenWorlds);
                     config.save();
-                    sender.sendMessage(Title + "  §6记步开启在世界§a" + level);
+                    sender.sendMessage(Title + "  §6火把寿命开启在世界§a" + level);
                 } else {
                     sender.sendMessage(Title + "  §c未输入要添加的地图名");
                     sender.sendMessage(Title + "  §a用法: /tlt addworld [地图名]");
@@ -133,7 +133,7 @@ public class TorchLimit extends PluginBase implements Listener {
                     this.OpenWorlds.remove(level);
                     config.set("open-worlds", OpenWorlds);
                     config.save();
-                    sender.sendMessage(Title + "  §6记步关闭在世界§a" + level);
+                    sender.sendMessage(Title + "  §6火把寿命关闭在世界§a" + level);
                 } else {
                     sender.sendMessage(Title + "  §c未输入要删除的地图名");
                     sender.sendMessage(Title + "  §a用法: /tlt delworld [地图名]");
@@ -154,28 +154,31 @@ public class TorchLimit extends PluginBase implements Listener {
 
 class Task extends cn.nukkit.scheduler.Task {
 
-    private int limitTime;
+    private long limitTime;
     private TorchLimit plugin;
 
-    public Task(int limitTime, TorchLimit plugin) {
+    public Task(long limitTime, TorchLimit plugin) {
         this.limitTime = limitTime;
         this.plugin = plugin;
     }
+
+    private ArrayList<String> cleanTorch = new ArrayList<>();
 
     @Override
     public void onRun(int tick) {
         for (String blocks : plugin.blocks) {
             String[] pos = blocks.split("\\+");
-            int time = Integer.parseInt(pos[4]);
+            long time = Long.parseLong(pos[4].trim());
             if (new Date().getTime() - time > limitTime) {
-                int x = Integer.parseInt(pos[0]);
-                int y = Integer.parseInt(pos[1]);
-                int z = Integer.parseInt(pos[2]);
+                double x = Double.parseDouble(pos[0]);
+                double y = Double.parseDouble(pos[1]);
+                double z = Double.parseDouble(pos[2]);
                 String levelName = pos[3];
                 plugin.getServer().getLevelByName(levelName).setBlock(new Vector3(x, y, z), Block.get(Block.AIR));
-                plugin.blocks.remove(blocks);
+                cleanTorch.add(blocks);
             }
         }
+        plugin.blocks.removeAll(cleanTorch);
     }
 }
 
