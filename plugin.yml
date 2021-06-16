@@ -1,0 +1,19 @@
+name: TorchLimit
+main: xyz.champrin.torchlimit.TorchLimit
+version: "1.0.0"
+api: ["1.0.8"]
+
+author: Champrin
+description: "TorchLimit"
+
+commands:
+  tlt:
+    permission: TorchLimit.command.op
+    usage: "/tlt help"
+    description: "§eTorchLimit"
+    aliases: []
+permissions:
+  FbLimit.command.op:
+    default: op
+  FbLimit.command.true:
+    default: true
